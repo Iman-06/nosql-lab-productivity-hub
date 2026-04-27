@@ -138,29 +138,16 @@ async function deleteTask(db, taskId) {
     deletedCount: result.deletedCount
   };
 }
-
-/**
- * Query 13: searchNotes
- * -------------------------------------------------------------
- * Find notes belonging to a user that match ANY of the given tags.
- * Optionally restrict to one project.
- *
- * @param {Db} db
- * @param {ObjectId} ownerId
- * @param {string[]} tags        — match notes whose tags array contains
- *                                 at least one of these
- * @param {ObjectId} [projectId] — optional. If given, restrict to this project.
- * @returns {Promise<Array<Object>>}
- *
- * Expected output: array of note documents matching the filter,
- *                  sorted by createdAt descending.
- *
- * Hint: the operator that says "field's value is one of these" is $in.
- *       Build the filter conditionally based on whether projectId was passed.
- */
 async function searchNotes(db, ownerId, tags, projectId) {
-  // TODO: implement
-  throw new Error('searchNotes not implemented');
+  const filter = {
+    ownerId: ownerId,
+    tags: { $in: tags }
+  };
+  if (projectId) {
+    filter.projectId = projectId;
+  }
+  return await db.collection('notes')
+    .find(filter).sort({ createdAt: -1 }).toArray();
 }
 async function projectTaskSummary(db, ownerId) {
   return await db.collection('tasks').aggregate([
