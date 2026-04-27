@@ -31,25 +31,19 @@ async function createProject(db, projectData) {
 
   return { insertedId: result.insertedId };
 }
-
-/**
- * Query 5: archiveProject
- * -------------------------------------------------------------
- * Mark a project as archived (do not delete).
- *
- * @param {Db} db
- * @param {ObjectId} projectId
- * @returns {Promise<{ matchedCount: number, modifiedCount: number }>}
- *
- * Expected behaviour:
- *   - matched and modified should both be 1 on success
- *   - matched=0 if projectId doesn't exist
- *
- * Hint: updateOne with the $set operator.
- */
 async function archiveProject(db, projectId) {
-  // TODO: implement
-  throw new Error('archiveProject not implemented');
+  const result = await db.collection('projects').updateOne(
+    { _id: projectId },
+    {
+      $set: {
+        archived: true
+      }
+    }
+  );
+  return {
+    matchedCount: result.matchedCount,
+    modifiedCount: result.modifiedCount
+  };
 }
 
 /**
