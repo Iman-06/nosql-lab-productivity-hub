@@ -20,23 +20,16 @@ async function listUserProjects(db, ownerId) {
     })
     .sort({ createdAt: -1 }).toArray();
 }
-
-/**
- * Query 4: createProject
- * -------------------------------------------------------------
- * Insert a new project for a user.
- *
- * @param {Db} db
- * @param {{ ownerId: ObjectId, name: string, description?: string }} projectData
- * @returns {Promise<{ insertedId: ObjectId }>}
- *
- * The document should default `archived: false` and set `createdAt: new Date()`.
- *
- * Hint: insertOne again — just remember to add the defaults yourself.
- */
 async function createProject(db, projectData) {
-  // TODO: implement
-  throw new Error('createProject not implemented');
+  const result = await db.collection('projects').insertOne({
+    ownerId: projectData.ownerId,
+    name: projectData.name,
+    description: projectData.description,
+    archived: false,
+    createdAt: new Date()
+  });
+
+  return { insertedId: result.insertedId };
 }
 
 /**
