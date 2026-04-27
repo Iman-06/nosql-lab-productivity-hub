@@ -56,33 +56,20 @@ async function listProjectTasks(db, projectId, status) {
       createdAt: -1
     }).toArray();
 }
-
-/**
- * Query 7: createTask
- * -------------------------------------------------------------
- * Insert a new task. Tasks have embedded subtasks and a tags array.
- *
- * @param {Db} db
- * @param {{
- *   ownerId: ObjectId,
- *   projectId: ObjectId,
- *   title: string,
- *   priority?: number,         // default 1
- *   tags?: string[],           // default []
- *   subtasks?: Array<{title: string, done: boolean}>  // default []
- * }} taskData
- * @returns {Promise<{ insertedId: ObjectId }>}
- *
- * The inserted document should also include `status: "todo"` and
- * `createdAt: new Date()`.
- *
- * Hint: insertOne. Apply defaults for any missing optional fields.
- */
 async function createTask(db, taskData) {
-  // TODO: implement
-  throw new Error('createTask not implemented');
-}
+  const result = await db.collection('tasks').insertOne({
+    ownerId: taskData.ownerId,
+    projectId: taskData.projectId,
+    title: taskData.title,
+    priority: taskData.priority || 1,
+    tags: taskData.tags || [],
+    subtasks: taskData.subtasks || [],
+    status: "todo",
+    createdAt: new Date()
+  });
 
+  return { insertedId: result.insertedId };
+}
 /**
  * Query 8: updateTaskStatus
  * -------------------------------------------------------------
