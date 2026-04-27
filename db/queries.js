@@ -130,20 +130,13 @@ async function toggleSubtask(db, taskId, subtaskTitle, newDone) {
     modifiedCount: result.modifiedCount
   };
 }
-/**
- * Query 12: deleteTask
- * -------------------------------------------------------------
- * Permanently delete a task.
- *
- * @param {Db} db
- * @param {ObjectId} taskId
- * @returns {Promise<{ deletedCount: number }>}
- *
- * Hint: deleteOne.
- */
 async function deleteTask(db, taskId) {
-  // TODO: implement
-  throw new Error('deleteTask not implemented');
+  const result = await db.collection('tasks').deleteOne({
+    _id: taskId
+  });
+  return {
+    deletedCount: result.deletedCount
+  };
 }
 
 /**
