@@ -70,21 +70,19 @@ async function createTask(db, taskData) {
 
   return { insertedId: result.insertedId };
 }
-/**
- * Query 8: updateTaskStatus
- * -------------------------------------------------------------
- * Change a task's status field.
- *
- * @param {Db} db
- * @param {ObjectId} taskId
- * @param {string} newStatus  — "todo" | "in-progress" | "done"
- * @returns {Promise<{ matchedCount: number, modifiedCount: number }>}
- *
- * Hint: updateOne + $set.
- */
 async function updateTaskStatus(db, taskId, newStatus) {
-  // TODO: implement
-  throw new Error('updateTaskStatus not implemented');
+  const result = await db.collection('tasks').updateOne(
+    { _id: taskId },
+    {
+      $set: {
+        status: newStatus
+      }
+    }
+  );
+  return {
+    matchedCount: result.matchedCount,
+    modifiedCount: result.modifiedCount
+  };
 }
 
 /**
