@@ -45,27 +45,16 @@ async function archiveProject(db, projectId) {
     modifiedCount: result.modifiedCount
   };
 }
-
-/**
- * Query 6: listProjectTasks
- * -------------------------------------------------------------
- * List tasks for one project, with an optional status filter,
- * sorted by priority descending then createdAt descending.
- *
- * @param {Db} db
- * @param {ObjectId} projectId
- * @param {string} [status]  — optional. One of "todo" | "in-progress" | "done".
- *                             If omitted, return tasks of ALL statuses.
- * @returns {Promise<Array<Object>>}
- *
- * Expected output: array of task documents.
- *
- * Hint: build the filter object dynamically. Only add the `status` key when
- *       the caller passed one. Then chain .sort({ priority: -1, createdAt: -1 }).
- */
 async function listProjectTasks(db, projectId, status) {
-  // TODO: implement
-  throw new Error('listProjectTasks not implemented');
+  const filter = { projectId: projectId };
+  if (status) {
+    filter.status = status;
+  }
+  return await db.collection('tasks')
+    .find(filter).sort({
+      priority: -1,
+      createdAt: -1
+    }).toArray();
 }
 
 /**
