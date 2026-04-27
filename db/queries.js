@@ -12,24 +12,13 @@ async function signupUser(db, userData) {
 async function loginFindUser(db, email) {
   return await db.collection('users').findOne({ email });
 }
-/**
- * Query 3: listUserProjects
- * -------------------------------------------------------------
- * List all NON-archived projects belonging to one user, newest first.
- *
- * @param {Db} db
- * @param {ObjectId} ownerId
- * @returns {Promise<Array<Object>>}
- *
- * Expected output: array of project documents, each shaped like:
- *   { _id, ownerId, name, archived: false, createdAt, ... }
- *   sorted by createdAt descending.
- *
- * Hint: find with two filter conditions, then .sort().toArray().
- */
 async function listUserProjects(db, ownerId) {
-  // TODO: implement
-  throw new Error('listUserProjects not implemented');
+  return await db.collection('projects')
+    .find({
+      ownerId: ownerId,
+      archived: false
+    })
+    .sort({ createdAt: -1 }).toArray();
 }
 
 /**
