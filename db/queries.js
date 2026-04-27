@@ -229,44 +229,72 @@ async function searchNotes(db, ownerId, tags, projectId) {
   // TODO: implement
   throw new Error('searchNotes not implemented');
 }
-
-/**
- * Query 14: projectTaskSummary
- * -------------------------------------------------------------
- * For one user, return per-project counts of tasks grouped by status,
- * with the project name attached. THIS IS THE NoSQL "JOIN".
- *
- * @param {Db} db
- * @param {ObjectId} ownerId
- * @returns {Promise<Array<Object>>}
- *
- * Expected output shape — one document per project:
- *   {
- *     _id: ObjectId,             // the projectId
- *     projectName: "Final Year Project",
- *     todo: 3,
- *     inProgress: 2,
- *     done: 5,
- *     total: 10
- *   }
- *
- * Pipeline outline:
- *   1. $match    — only this user's tasks
- *   2. $group    — group by projectId; use $sum with $cond to count per status
- *                  e.g. todo: { $sum: { $cond: [{ $eq: ["$status", "todo"] }, 1, 0] } }
- *   3. $lookup   — join "projects" collection to get the name. Use:
- *                    from: "projects", localField: "_id",
- *                    foreignField: "_id", as: "project"
- *   4. $unwind   — flatten the joined "project" array (it has at most 1 element)
- *   5. $project  — reshape into the expected output above
- *
- * Hint: $lookup returns an ARRAY (because joins can match many).
- *       $unwind turns a 1-element array into the element itself.
- */
 async function projectTaskSummary(db, ownerId) {
-  // TODO: implement
-  throw new Error('projectTaskSummary not implemented');
+  return await db.collection('tasks').aggregate([
+    {
+      $match: {
+        ownerId: ownerId
+      }
+    },
+    {
+      $group: {
+        _id: "$projectId",
+        todo: {
+          $sum: {
+            $cond: [
+              { $eq: ["$status", "todo"] },
+              1, //if status is todo add 1 else 0
+              0
+            ]
+          }
+        },
+        inProgress: {
+          $sum: {
+            $cond: [
+              { $eq: ["$status", "in-progress"] },
+              1,
+              0
+            ]
+          }
+        },
+
+        done: {
+          $sum: {
+            $cond: [
+              { $eq: ["$status", "done"] },
+              1,
+              0
+            ]
+          }
+        },
+
+        total: { $sum: 1 } // each task contributes 1 
+      }
+    },
+    {
+      $lookup: {
+        from: "projects",
+        localField: "_id",
+        foreignField: "_id",
+        as: "project"
+      }
+    },
+    {
+      $unwind: "$project"
+    },
+    {
+      $project: {
+        _id: 1,
+        projectName: "$project.name",
+        todo: 1,
+        inProgress: 1,
+        done: 1,
+        total: 1
+      }
+    }
+  ]).toArray();
 }
+
 
 /**
  * Query 15: recentActivityFeed
