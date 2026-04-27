@@ -98,29 +98,21 @@ async function addTaskTag(db, taskId, tag) {
     modifiedCount: result.modifiedCount
   };
 }
-
-
-/**
- * Query 10: removeTaskTag
- * -------------------------------------------------------------
- * Remove a tag from a task's tags array.
- *
- * @param {Db} db
- * @param {ObjectId} taskId
- * @param {string} tag
- * @returns {Promise<{ matchedCount: number, modifiedCount: number }>}
- *
- * Expected behaviour:
- *   - If tag was present → modifiedCount = 1
- *   - If tag wasn't present → modifiedCount = 0
- *
- * Hint: $pull.
- */
 async function removeTaskTag(db, taskId, tag) {
-  // TODO: implement
-  throw new Error('removeTaskTag not implemented');
-}
+  const result = await db.collection('tasks').updateOne(
+    { _id: taskId },
+    {
+      $pull: {
+        tags: tag
+      }
+    }
+  );
 
+  return {
+    matchedCount: result.matchedCount,
+    modifiedCount: result.modifiedCount
+  };
+}
 /**
  * Query 11: toggleSubtask
  * -------------------------------------------------------------
