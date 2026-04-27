@@ -84,27 +84,21 @@ async function updateTaskStatus(db, taskId, newStatus) {
     modifiedCount: result.modifiedCount
   };
 }
-
-/**
- * Query 9: addTaskTag
- * -------------------------------------------------------------
- * Append a tag to a task's tags array, BUT only if it isn't already present.
- *
- * @param {Db} db
- * @param {ObjectId} taskId
- * @param {string} tag
- * @returns {Promise<{ matchedCount: number, modifiedCount: number }>}
- *
- * Expected behaviour:
- *   - If tag is new → modifiedCount = 1, tags array gains the new entry
- *   - If tag is already present → modifiedCount = 0 (no duplicate added)
- *
- * Hint: which array operator silently skips duplicates? It is NOT $push.
- */
 async function addTaskTag(db, taskId, tag) {
-  // TODO: implement
-  throw new Error('addTaskTag not implemented');
+  const result = await db.collection('tasks').updateOne(
+    { _id: taskId },
+    {
+      $addToSet: { //add if not already present
+        tags: tag
+      }
+    }
+  );
+  return {
+    matchedCount: result.matchedCount,
+    modifiedCount: result.modifiedCount
+  };
 }
+
 
 /**
  * Query 10: removeTaskTag
